@@ -1,10 +1,18 @@
 import type { TBATeam, TBARanking, TBARankingsResponse, TBAMatch } from '../types'
 import { FRC_EVENT_CODE } from '../constants'
 
-const BASE = '/api/tba'
+// In production the Vite dev-proxy doesn't exist — call TBA directly
+// with X-TBA-Auth-Key injected from VITE_ env var (embedded at build time).
+const PROD = import.meta.env.PROD
+const BASE = PROD ? 'https://www.thebluealliance.com/api/v3' : '/api/tba'
+
+function headers(): Record<string, string> {
+  if (!PROD) return {}
+  return { 'X-TBA-Auth-Key': import.meta.env.VITE_TBA_API_SECRET as string }
+}
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`)
+  const res = await fetch(`${BASE}${path}`, { headers: headers() })
   if (!res.ok) throw new Error(`TBA ${res.status}: ${await res.text()}`)
   return res.json() as Promise<T>
 }

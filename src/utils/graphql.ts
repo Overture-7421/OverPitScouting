@@ -1,6 +1,11 @@
 import type { GQLEventData } from '../types'
 import { EVENT_CODE, SEASON } from '../constants'
 
+// In production the Vite dev-proxy doesn't exist — call FTCScout directly.
+const GQL_URL = import.meta.env.PROD
+  ? 'https://api.ftcscout.org/graphql'
+  : '/api/graphql'
+
 const QUERY = `{
   eventByCode(season: ${SEASON}, code: "${EVENT_CODE}") {
     name start end
@@ -30,7 +35,7 @@ const QUERY = `{
 }`
 
 export async function fetchGQLEvent(): Promise<GQLEventData> {
-  const res = await fetch('/api/graphql', {
+  const res = await fetch(GQL_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: QUERY }),

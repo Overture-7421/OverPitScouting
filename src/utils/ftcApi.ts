@@ -1,12 +1,24 @@
 import type { FTCTeam, FTCRanking, HybridMatch } from '../types'
 import { EVENT_CODE, SEASON } from '../constants'
 
-const BASE = '/api/ftc'
+// In production the Vite dev-proxy doesn't exist — call FTC Events API directly
+// with Basic auth injected from VITE_ env vars (embedded at build time).
+const PROD = import.meta.env.PROD
+const BASE = PROD ? 'https://ftc-api.firstinspires.org' : '/api/ftc'
+
+function headers(): Record<string, string> {
+  const base: Record<string, string> = { Accept: 'application/json' }
+  if (PROD) {
+    const token = btoa(
+      `${import.meta.env.VITE_FTC_API_USERNAME}:${import.meta.env.VITE_FTC_API_SECRET}`,
+    )
+    base['Authorization'] = `Basic ${token}`
+  }
+  return base
+}
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    headers: { Accept: 'application/json' },
-  })
+  const res = await fetch(`${BASE}${path}`, { headers: headers() })
   if (!res.ok) {
     const text = await res.text().catch(() => '')
     throw new Error(`FTC API ${res.status}: ${text || res.statusText}`)

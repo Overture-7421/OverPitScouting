@@ -1,7 +1,11 @@
 import type { StatboticsTeamEvent, StatboticsMatch } from '../types'
 import { FRC_EVENT_CODE } from '../constants'
 
-const BASE = '/api/statbotics'
+// In production the Vite dev-proxy doesn't exist — call Statbotics directly.
+// Statbotics is a public API with no authentication required.
+const BASE = import.meta.env.PROD
+  ? 'https://api.statbotics.io'
+  : '/api/statbotics'
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`)
