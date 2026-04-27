@@ -1,0 +1,7 @@
+name = "ftc-api-proxy"
+main = "index.js"
+compatibility_date = "2024-09-23"
+
+# Secrets are NOT stored here — set them with:
+#   wrangler secret put FTC_API_USERNAME
+#   wrangler secret put FTC_API_SECRET

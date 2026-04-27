@@ -31,7 +31,7 @@ The app opens with a full-screen selector. Pick **FTC** or **FRC** — each mode
 
 The `docs/` folder is the built static app served via **GitHub Pages** (branch `main`, `/docs` folder).
 
-> **Note — API features on GitHub Pages:** The CSV upload and Tier List views work fully in the deployed app. The API views (GraphQL, REST API, Blue Alliance, Statbotics) require the local dev server because API keys are injected server-side by the Vite proxy and are never embedded in the built bundle. Run `npm run dev` locally at the event venue to use live API data.
+> **API access on GitHub Pages:** CSV upload and Tier List are fully client-side. FTCScout GraphQL, TBA, and Statbotics all support browser CORS and work in the deployed app. The FTC Events REST API does **not** support browser CORS — it routes through a Cloudflare Worker (see setup below). Deploy the worker once and add its URL to `.env` before building.
 
 ---
 
@@ -49,23 +49,56 @@ cd FTCPitScoutingAnalyzer
 npm install
 ```
 
-Create a `.env` file in the project root (never commit this):
+Create a `.env` file in the project root (see `.env.example` — never commit `.env`):
 
 ```env
-# FTC Events API — https://ftc-api.firstinspires.org
-FTC_API_USERNAME=your_username
-FTC_API_SECRET=your_secret
+# Dev proxy (not embedded in bundle)
+FTC_API_USERNAME=your_ftc_username
+FTC_API_SECRET=your_ftc_secret
 
-# The Blue Alliance API — https://www.thebluealliance.com/account
 TBA_API_SECRET=your_tba_auth_key
-TBA_API_DESCRIPTION=PitScoutingAnalyzer
+
+# Production — embedded in bundle at build time
+VITE_TBA_API_SECRET=your_tba_auth_key
+VITE_FTC_PROXY_URL=https://ftc-api-proxy.YOUR-SUBDOMAIN.workers.dev
 ```
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173). All API calls route through the Vite proxy which injects authentication headers.
+Open [http://localhost:5173](http://localhost:5173). All API calls route through the Vite dev proxy.
+
+---
+
+## Cloudflare Worker (FTC Events API CORS proxy)
+
+`ftc-api.firstinspires.org` blocks browser cross-origin requests — it doesn't respond to CORS preflight. The solution is a thin Cloudflare Worker that proxies the calls server-side and adds `Access-Control-Allow-Origin` headers. The free tier covers 100k requests/day.
+
+**One-time setup:**
+
+```bash
+# 1. Install Wrangler (Cloudflare CLI)
+npm install -g wrangler
+
+# 2. Log in to your Cloudflare account
+wrangler login
+
+# 3. Deploy from the proxy-worker/ folder
+cd proxy-worker
+wrangler deploy
+
+# 4. Set your FTC credentials as Worker secrets (stored encrypted in Cloudflare, never in code)
+wrangler secret put FTC_API_USERNAME   # enter: santiq0905
+wrangler secret put FTC_API_SECRET     # enter: your-secret-uuid
+```
+
+After deploying, Wrangler prints your worker URL:
+```
+https://ftc-api-proxy.YOUR-SUBDOMAIN.workers.dev
+```
+
+Add it to `.env` as `VITE_FTC_PROXY_URL`, then rebuild and redeploy the GitHub Pages site.
 
 ---
 

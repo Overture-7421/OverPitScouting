@@ -1,20 +1,19 @@
 import type { FTCTeam, FTCRanking, HybridMatch } from '../types'
 import { EVENT_CODE, SEASON } from '../constants'
 
-// In production the Vite dev-proxy doesn't exist — call FTC Events API directly
-// with Basic auth injected from VITE_ env vars (embedded at build time).
+// ftc-api.firstinspires.org blocks browser CORS requests.
+// In production we route through a Cloudflare Worker (proxy-worker/) that adds
+// the Basic auth header server-side and returns CORS headers.
+// Set VITE_FTC_PROXY_URL in .env to the deployed worker URL.
 const PROD = import.meta.env.PROD
-const BASE = PROD ? 'https://ftc-api.firstinspires.org' : '/api/ftc'
+const BASE = PROD
+  ? (import.meta.env.VITE_FTC_PROXY_URL as string ?? '').replace(/\/$/, '')
+  : '/api/ftc'
 
 function headers(): Record<string, string> {
-  const base: Record<string, string> = { Accept: 'application/json' }
-  if (PROD) {
-    const token = btoa(
-      `${import.meta.env.VITE_FTC_API_USERNAME}:${import.meta.env.VITE_FTC_API_SECRET}`,
-    )
-    base['Authorization'] = `Basic ${token}`
-  }
-  return base
+  return { Accept: 'application/json' }
+  // Auth is handled by the Cloudflare Worker in production (secrets stored there).
+  // In dev the Vite proxy injects the Authorization header.
 }
 
 async function get<T>(path: string): Promise<T> {
