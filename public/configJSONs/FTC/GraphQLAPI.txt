@@ -1,0 +1,4 @@
+GraphQL
+The FTCScout GraphQL API provides access to all of the FTCScout's data and statistics. It is used internally by the website. Because it uses GraphQL, you can access as much or as little data as you need. You can query this API at api.ftcscout.org/graphql 
+
+I want the data from /events/2025/FTCCMP1GOOD

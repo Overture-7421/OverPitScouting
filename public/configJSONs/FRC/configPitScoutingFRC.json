@@ -1,0 +1,196 @@
+{
+  "category": "FRC",
+  "version": "2.3.0",
+  "questionnaires": {
+    "Mech": {
+      "label": "Mecánica",
+      "fields": [
+        {
+          "label": "¿Es un chassis?",
+          "key": "is_robot_chassis",
+          "type": "dropdown",
+          "options": ["Si", "No"]
+        },
+        {
+          "label": "¿Pasa por debajo del Trench?",
+          "key": "goes_under_trench",
+          "type": "dropdown",
+          "options": ["Si", "No"]
+        },
+        {
+          "label": "¿Cuentan con una checklist para antes de la partida?",
+          "key": "mech_checklist",
+          "type": "dropdown",
+          "options": ["Si", "No"]
+        },
+        {
+          "label": "¿Cuentan con repuestos de sus mecanismos?",
+          "key": "mech_spare_parts",
+          "type": "dropdown",
+          "options": ["Tenemos para todos los mecanismos", "Tenemos solo para varios", "No tenemos ningún repuesto"]
+        },
+        {
+          "label": "¿El robot tiene tornillería estandarizada?",
+          "key": "mech_std_bolts",
+          "type": "dropdown",
+          "options": ["Si", "No"]
+        },
+        {
+          "label": "¿Cual mecanismo más les da problema?",
+          "key": "mech_problem_mechanism",
+          "type": "dropdown",
+          "options": ["Intake", "Shooter", "Climber", "Indexer", "Chasis"]
+        },
+        {
+          "label": "¿Que tipo de chasis usan?",
+          "key": "mech_chassis_type",
+          "type": "dropdown",
+          "options": ["Tank", "Mecanum", "Swerve"]
+        },
+        {
+          "label": "¿Cuántas pelotas le caben al robot?",
+          "key": "mech_ball_capacity",
+          "type": "number"
+        },
+        {
+          "label": "Pelotas por Segundo Aproximado",
+          "key": "ballspersecond_number",
+          "type": "text"
+        }
+      ]
+    },
+    "Programming": {
+      "label": "Programación",
+      "fields": [
+        {
+          "label": "¿Utilizan Path Planner para sus autónomos?",
+          "key": "prog_path_planner",
+          "type": "dropdown",
+          "options": ["Si", "No"]
+        },
+        {
+          "label": "¿Qué tan fácil es cambiar un autónomo?",
+          "key": "prog_auto_change",
+          "type": "dropdown",
+          "options": ["Sencillo", "Difícil"]
+        },
+        {
+          "label": "¿Si su autónomo se prueba 10 veces, que tantas veces saldría bien?",
+          "key": "prog_auto_reliability",
+          "type": "dropdown",
+          "options": ["Menos de 5", "Menos de 10", "10 veces siempre"]
+        },
+        {
+          "label": "¿Qué tipo de odometría utilizan?",
+          "key": "prog_odometry_type",
+          "type": "dropdown",
+          "options": ["Encoders de llanta", "Estimación por swerve", "Corrección por april tag", "Fusión de sensores"]
+        },
+        {
+          "label": "¿Qué orientación de control tienen?",
+          "key": "prog_drive_orient",
+          "type": "dropdown",
+          "options": ["Orientación de robot", "Orientación de Cancha", "Ambas"]
+        }
+      ]
+    },
+    "Electrical": {
+      "label": "Eléctrica",
+      "fields": [
+        {
+          "label": "¿Cuentan con CANivore?",
+          "key": "elec_canivore",
+          "type": "dropdown",
+          "options": ["Si", "No"]
+        },
+        {
+          "label": "¿Sus cables ethernet están hechos por ustedes o comprados?",
+          "key": "elec_ethernet_cables",
+          "type": "dropdown",
+          "options": ["Hechos por nosotros", "Comprados"]
+        },
+        {
+          "label": "¿Dónde se encuentra el Radio del robot?",
+          "key": "elec_radio_location",
+          "type": "dropdown",
+          "options": ["Expuesto como el nuestro", "Escondido de muchas cosas"]
+        },
+        {
+          "label": "¿Qué tan fácil es cambiar un cable que se rompa?",
+          "key": "elec_cable_replace",
+          "type": "dropdown",
+          "options": ["Sencillo", "Difícil"]
+        },
+        {
+          "label": "¿Cuentan con Battery Peak?",
+          "key": "elec_battery_peak",
+          "type": "dropdown",
+          "options": ["Si", "No"]
+        },
+        {
+          "label": "¿Es accessible?",
+          "key": "elec_accessible",
+          "type": "dropdown",
+          "options": ["Si", "No"]
+        }
+      ]
+    },
+    "Competences": {
+      "label": "Competencias",
+      "fields": [
+        {
+          "label": "Robot Specialization",
+          "key": "robot_specialization",
+          "type": "dropdown",
+          "options": ["Score", "Feed", "Steal", "Defend", "Overall"]
+        },
+        {
+          "label": "¿Con cuántas pilas cuenta el equipo?",
+          "key": "comp_batteries",
+          "type": "dropdown",
+          "options": ["Menos de 5", "Menos de 10", "Más de 10"]
+        },
+        {
+          "label": "¿Cuánto tiempo tardan en cambiar los bumpers?",
+          "key": "comp_bumper_time",
+          "type": "dropdown",
+          "options": ["Menos de 1 minuto", "Menos de 2 minutos", "Más de 2 minutos"]
+        },
+        {
+          "label": "¿Si hay algún problema con el robot, es necesario tener a los drivers para arreglarlo?",
+          "key": "comp_drivers_needed",
+          "type": "dropdown",
+          "options": ["Si", "No"]
+        },
+        {
+          "label": "En promedio, ¿cuántas pelotas por segundo se disparan?",
+          "key": "comp_balls_per_second",
+          "type": "number"
+        },
+        {
+          "label": "¿Hay más mentores que alumnos en el pit?",
+          "key": "comp_mentors_vs_students",
+          "type": "dropdown",
+          "options": ["Son más mentores", "Son más alumnos"]
+        }
+      ]
+    }
+  },
+  "commonFields": [
+    {
+      "label": "Número de equipo",
+      "key": "team_number",
+      "type": "number"
+    },
+    {
+      "label": "Nombre del examinador",
+      "key": "examiner_name",
+      "type": "text"
+    },
+    {
+      "label": "Como examinador, ¿cómo te sentiste evaluando a este equipo?",
+      "key": "examiner_feeling",
+      "type": "textarea"
+    }
+  ]
+}
