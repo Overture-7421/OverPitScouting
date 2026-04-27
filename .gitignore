@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+# docs/ is the GitHub Pages build output — do NOT ignore it
 *.local
 
 # Editor directories and files

@@ -347,7 +347,7 @@ export function PitScoutingView({ records, onLoad }: Props) {
               <h3>Controller Types</h3>
               <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
-                  <Pie data={groupByCount(filtered, 'elec_controller')} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${Math.round((percent ?? 0) * 100)}%`}>
+                  <Pie data={groupByCount(filtered, 'elec_controller')} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ percent }) => `${Math.round((percent ?? 0) * 100)}%`}>
                     {groupByCount(filtered, 'elec_controller').map((_, i) => (
                       <Cell key={i} fill={CHART_COLORS[(i + 3) % CHART_COLORS.length]} />
                     ))}

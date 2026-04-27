@@ -8,6 +8,8 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    base: './',
+    build: { outDir: 'docs', emptyOutDir: true },
     server: {
       proxy: {
         '/api/ftc': {
