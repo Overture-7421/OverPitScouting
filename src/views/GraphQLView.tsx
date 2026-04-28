@@ -112,24 +112,24 @@ export function GraphQLView() {
           <h2 className="view-title">FTCScout GraphQL</h2>
           <p className="view-subtitle">api.ftcscout.org · {data.name} · {SEASON}</p>
         </div>
-        <button className="btn btn-outline" onClick={load}>↻ Refresh</button>
+        <button className="btn btn-outline" onClick={load}><span className="material-icons" style={{ fontSize: 16 }}>refresh</span> Refresh</button>
       </div>
 
       {data.location && (
         <div className="location-badge">
-          📍 {[data.location.venue, data.location.city, data.location.state, data.location.country].filter(Boolean).join(', ')}
+          <span className="material-icons" style={{ fontSize: 14 }}>location_on</span>
+          {[data.location.venue, data.location.city, data.location.state, data.location.country].filter(Boolean).join(', ')}
         </div>
       )}
 
       <div className="stat-grid">
-        <StatCard label="Teams" value={allTeams.length} icon="🤖" color="#8b5cf6" />
-        <StatCard label="Ranked Teams" value={rankedTeams.length} icon="🏆" color="#f59e0b" />
-        <StatCard label="Matches Played" value={playedMatches.length} icon="⚔️" color="#22c55e" />
-        <StatCard label="Total Matches" value={allMatches.length} icon="📋" color="#3b82f6" />
-        <StatCard label="Avg Red Score" value={avgRed} icon="🔴" color="#ef4444" />
-        <StatCard label="Avg Blue Score" value={avgBlue} icon="🔵" color="#3b82f6" />
-        <StatCard label="Top OPR" value={topOPR.toFixed(1)} icon="⭐" color="#f59e0b" />
-        <StatCard label="Avg Blue Score" value={avgBlue} icon="🔵" color="#06b6d4" />
+        <StatCard label="Teams" value={allTeams.length} icon="smart_toy" color="#8b5cf6" />
+        <StatCard label="Ranked Teams" value={rankedTeams.length} icon="emoji_events" color="#f59e0b" />
+        <StatCard label="Matches Played" value={playedMatches.length} icon="sports" color="#22c55e" />
+        <StatCard label="Total Matches" value={allMatches.length} icon="assignment" color="#3b82f6" />
+        <StatCard label="Avg Red Score" value={avgRed} icon="circle" color="#ef4444" />
+        <StatCard label="Avg Blue Score" value={avgBlue} icon="circle" color="#3b82f6" />
+        <StatCard label="Top OPR" value={topOPR.toFixed(1)} icon="grade" color="#f59e0b" />
       </div>
 
       {top20RP.length > 0 && (
@@ -224,7 +224,7 @@ export function GraphQLView() {
                     [['rank', 'Rank'], ['teamNumber', 'Team'], ['rp', 'RP'], ['opr', 'OPR'], ['wins', 'W'], ['losses', 'L'], ['ties', 'T']] as [SortKey, string][]
                   ).map(([k, label]) => (
                     <th key={k} onClick={() => setSort(k)} className="sortable">
-                      {label} {sortKey === k ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+                      {label} {sortKey === k && <span className="material-icons sort-icon">{sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}</span>}
                     </th>
                   ))}
                   <th>Auto OPR</th>

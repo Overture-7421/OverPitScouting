@@ -19,13 +19,13 @@ function buildInitialState(records: FRCScoutingRecord[]): TierState {
 }
 
 function chassisIcon(chassis: string): string {
-  if (chassis === 'Swerve') return '🔄'
-  if (chassis === 'Mecanum') return '⚙️'
-  return '🚗'
+  if (chassis === 'Swerve') return '360'
+  if (chassis === 'Mecanum') return 'settings'
+  return 'directions_car'
 }
 
 function specIcon(spec: string): string {
-  const map: Record<string, string> = { Score: '⚽', Feed: '🤲', Steal: '🦹', Defend: '🛡️', Overall: '⭐' }
+  const map: Record<string, string> = { Score: 'sports_soccer', Feed: 'back_hand', Steal: 'sports_kabaddi', Defend: 'shield', Overall: 'grade' }
   return map[spec] ?? ''
 }
 
@@ -94,7 +94,7 @@ export function FRCTierListView({ records }: Props) {
   if (records.length === 0) {
     return (
       <div className="empty-state">
-        <div style={{ fontSize: 48 }}>🏅</div>
+        <span className="material-icons empty-icon">leaderboard</span>
         <h2>No FRC Data Yet</h2>
         <p style={{ color: '#64748b' }}>Upload a CSV in Pit Scouting to auto-rank teams</p>
       </div>
@@ -128,11 +128,11 @@ export function FRCTierListView({ records }: Props) {
         <div className="chip-details">
           {rec && (
             <>
-              <span title="Chassis">{chassisIcon(rec.mech_chassis_type)}</span>
-              {rec.prog_path_planner === 'Si' && <span title="Path Planner">📍</span>}
-              {rec.elec_canivore === 'Si' && <span title="CANivore">⚡</span>}
-              {rec.robot_specialization && <span title={`Spec: ${rec.robot_specialization}`}>{specIcon(rec.robot_specialization)}</span>}
-              {rec.elec_battery_peak === 'Si' && <span title="Battery Peak">🔋</span>}
+              <span className="material-icons chip-detail-icon" title="Chassis">{chassisIcon(rec.mech_chassis_type)}</span>
+              {rec.prog_path_planner === 'Si' && <span className="material-icons chip-detail-icon" title="Path Planner">place</span>}
+              {rec.elec_canivore === 'Si' && <span className="material-icons chip-detail-icon" title="CANivore">bolt</span>}
+              {rec.robot_specialization && specIcon(rec.robot_specialization) && <span className="material-icons chip-detail-icon" title={`Spec: ${rec.robot_specialization}`}>{specIcon(rec.robot_specialization)}</span>}
+              {rec.elec_battery_peak === 'Si' && <span className="material-icons chip-detail-icon" title="Battery Peak">battery_full</span>}
             </>
           )}
         </div>
@@ -193,8 +193,8 @@ export function FRCTierListView({ records }: Props) {
     <div className="view-content">
       <div className="toolbar">
         <div className="toolbar-left">
-          <button className="btn btn-outline" onClick={reset}>↺ Reset to Auto</button>
-          <button className="btn btn-primary" onClick={exportTiers}>↓ Export CSV</button>
+          <button className="btn btn-outline" onClick={reset}><span className="material-icons" style={{ fontSize: 16 }}>restart_alt</span> Reset to Auto</button>
+          <button className="btn btn-primary" onClick={exportTiers}><span className="material-icons" style={{ fontSize: 16 }}>download</span> Export CSV</button>
           <span className="record-count">{records.length} teams · drag chips to re-rank</span>
         </div>
         <input
@@ -213,12 +213,12 @@ export function FRCTierListView({ records }: Props) {
       <div className="tier-legend">
         <h4>FRC Scoring Legend (max ~128 pts)</h4>
         <div className="legend-grid">
-          <span>🔄 Swerve +15 · Mecanum +8 · Tank +5</span>
-          <span>📍 Path Planner +10</span>
-          <span>⚡ CANivore +8</span>
-          <span>🎯 Perfect Auto +15 · ≥7/10 +8</span>
-          <span>🗺️ Odometry: Sensor Fusion +10 · AprilTag +9 · Swerve +7</span>
-          <span>🏅 S ≥ 90 · A ≥ 70 · B ≥ 50 · C ≥ 30</span>
+          <span>Swerve +15 · Mecanum +8 · Tank +5</span>
+          <span>Path Planner +10</span>
+          <span>CANivore +8</span>
+          <span>Perfect Auto +15 · ≥7/10 +8</span>
+          <span>Odometry: Sensor Fusion +10 · AprilTag +9 · Swerve +7</span>
+          <span>S ≥ 90 · A ≥ 70 · B ≥ 50 · C ≥ 30</span>
         </div>
       </div>
     </div>

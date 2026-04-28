@@ -12,17 +12,17 @@ import { ModeChooser } from './components/ModeChooser'
 import './App.css'
 
 const FTC_NAV: { id: ViewId; label: string; icon: string }[] = [
-  { id: 'pitscouting', label: 'Pit Scouting', icon: '🔧' },
-  { id: 'graphql',     label: 'GraphQL',      icon: '⬡' },
-  { id: 'api',         label: 'REST API',      icon: '☁' },
-  { id: 'tierlist',    label: 'Tier List',     icon: '🏅' },
+  { id: 'pitscouting', label: 'Pit Scouting', icon: 'engineering' },
+  { id: 'graphql',     label: 'GraphQL',      icon: 'hub' },
+  { id: 'api',         label: 'REST API',      icon: 'api' },
+  { id: 'tierlist',    label: 'Tier List',     icon: 'leaderboard' },
 ]
 
 const FRC_NAV: { id: FRCViewId; label: string; icon: string }[] = [
-  { id: 'pitscouting', label: 'Pit Scouting',   icon: '🔧' },
-  { id: 'tba',         label: 'Blue Alliance',   icon: '🔵' },
-  { id: 'statbotics',  label: 'Statbotics',      icon: '📊' },
-  { id: 'tierlist',    label: 'Tier List',        icon: '🏅' },
+  { id: 'pitscouting', label: 'Pit Scouting',  icon: 'engineering' },
+  { id: 'tba',         label: 'Blue Alliance',  icon: 'sports_score' },
+  { id: 'statbotics',  label: 'Statbotics',     icon: 'analytics' },
+  { id: 'tierlist',    label: 'Tier List',      icon: 'leaderboard' },
 ]
 
 export default function App() {
@@ -39,7 +39,7 @@ export default function App() {
       <div className="app">
         <header className="app-header">
           <div className="header-brand">
-            <span className="brand-logo">⬡</span>
+            <span className="material-icons brand-logo">precision_manufacturing</span>
             <div className="brand-text">
               <span className="brand-name">FTC Pit Analyzer</span>
               <span className="brand-sub">OVERTURE · FTCCMP1GOOD · 2025</span>
@@ -52,13 +52,14 @@ export default function App() {
                 className={`nav-btn${ftcView === n.id ? ' active' : ''}`}
                 onClick={() => setFtcView(n.id)}
               >
-                <span className="nav-icon">{n.icon}</span>
+                <span className="material-icons nav-icon">{n.icon}</span>
                 <span className="nav-label">{n.label}</span>
               </button>
             ))}
           </nav>
           <button className="btn btn-outline mode-switch-btn" onClick={() => setMode(null)}>
-            ⬡ Switch Program
+            <span className="material-icons" style={{ fontSize: 16 }}>swap_horiz</span>
+            <span className="nav-label">Switch Program</span>
           </button>
         </header>
         <main className="app-main" key={ftcView}>
@@ -75,7 +76,7 @@ export default function App() {
     <div className="app">
       <header className="app-header app-header-frc">
         <div className="header-brand">
-          <span className="brand-logo brand-logo-frc">⬡</span>
+          <span className="material-icons brand-logo brand-logo-frc">precision_manufacturing</span>
           <div className="brand-text">
             <span className="brand-name">FRC Pit Analyzer</span>
             <span className="brand-sub">OVERTURE · FRC · 2025</span>
@@ -88,13 +89,14 @@ export default function App() {
               className={`nav-btn${frcView === n.id ? ' active frc-active' : ''}`}
               onClick={() => setFrcView(n.id)}
             >
-              <span className="nav-icon">{n.icon}</span>
+              <span className="material-icons nav-icon">{n.icon}</span>
               <span className="nav-label">{n.label}</span>
             </button>
           ))}
         </nav>
         <button className="btn btn-outline mode-switch-btn" onClick={() => setMode(null)}>
-          ⬡ Switch Program
+          <span className="material-icons" style={{ fontSize: 16 }}>swap_horiz</span>
+          <span className="nav-label">Switch Program</span>
         </button>
       </header>
       <main className="app-main" key={frcView}>

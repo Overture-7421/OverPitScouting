@@ -86,7 +86,7 @@ export function TierListView({ records }: Props) {
     return (
       <div className="view-content">
         <div className="empty-state">
-          <div style={{ fontSize: 64, marginBottom: 16 }}>🏅</div>
+          <span className="material-icons empty-icon">leaderboard</span>
           <h2>No Scouting Data</h2>
           <p style={{ color: '#94a3b8' }}>Upload a CSV in the Pit Scouting tab to populate the tier list.</p>
         </div>
@@ -103,8 +103,8 @@ export function TierListView({ records }: Props) {
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <input className="search-input" placeholder="Search team #…" value={search} onChange={e => setSearch(e.target.value)} />
-          <button className="btn btn-outline" onClick={reset}>↺ Reset</button>
-          <button className="btn btn-primary" onClick={exportTiers}>⬇ Export CSV</button>
+          <button className="btn btn-outline" onClick={reset}><span className="material-icons" style={{ fontSize: 16 }}>restart_alt</span> Reset</button>
+          <button className="btn btn-primary" onClick={exportTiers}><span className="material-icons" style={{ fontSize: 16 }}>download</span> Export CSV</button>
         </div>
       </div>
 
@@ -116,7 +116,7 @@ export function TierListView({ records }: Props) {
             <div
               key={tier}
               className={`tier-row${dragOver === tier ? ' drag-target' : ''}`}
-              style={{ borderLeftColor: meta.color, boxShadow: dragOver === tier ? `0 0 20px ${meta.glow}` : undefined }}
+              style={{ borderLeftColor: meta.color }}
               onDragOver={e => { e.preventDefault(); setDragOver(tier) }}
               onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOver(null) }}
               onDrop={() => handleDrop(tier)}
@@ -144,19 +144,19 @@ export function TierListView({ records }: Props) {
                       </div>
                       {rec && (
                         <div className="chip-details">
-                          <span title="Climb">{rec.mech_has_climb ? '🧗' : ''}</span>
-                          <span title="Vision">{rec.prog_vision ? '👁' : ''}</span>
-                          <span title="Odometry">{rec.prog_odometry ? '📡' : ''}</span>
-                          <span title="Auto">{rec.prog_has_auto ? `⚡${rec.prog_auto_count}` : ''}</span>
-                          <span title="Alliance">{rec.comp_alliance_willing ? '🤝' : ''}</span>
+                          {rec.mech_has_climb && <span className="material-icons chip-detail-icon" title="Climb">fitness_center</span>}
+                          {rec.prog_vision && <span className="material-icons chip-detail-icon" title="Vision">visibility</span>}
+                          {rec.prog_odometry && <span className="material-icons chip-detail-icon" title="Odometry">sensors</span>}
+                          {rec.prog_has_auto && <><span className="material-icons chip-detail-icon" title="Auto">bolt</span><span style={{ fontSize: 11 }}>{rec.prog_auto_count}</span></>}
+                          {rec.comp_alliance_willing && <span className="material-icons chip-detail-icon" title="Alliance">handshake</span>}
                         </div>
                       )}
-                      {notes[team] && <div className="chip-note">📝 {notes[team].slice(0, 30)}{notes[team].length > 30 ? '…' : ''}</div>}
+                      {notes[team] && <div className="chip-note"><span className="material-icons chip-note-icon">notes</span>{notes[team].slice(0, 30)}{notes[team].length > 30 ? '…' : ''}</div>}
                       <button
                         className="chip-note-btn"
                         onClick={() => setNoteTeam(noteTeam === team ? null : team)}
                         title="Add note"
-                      >✏</button>
+                      ><span className="material-icons">edit</span></button>
                       {noteTeam === team && (
                         <textarea
                           className="chip-textarea"
@@ -212,9 +212,9 @@ export function TierListView({ records }: Props) {
                       </div>
                       {rec && (
                         <div className="chip-details">
-                          <span>{rec.mech_has_climb ? '🧗' : ''}</span>
-                          <span>{rec.prog_vision ? '👁' : ''}</span>
-                          <span>{rec.prog_odometry ? '📡' : ''}</span>
+                          {rec.mech_has_climb && <span className="material-icons chip-detail-icon" title="Climb">fitness_center</span>}
+                          {rec.prog_vision && <span className="material-icons chip-detail-icon" title="Vision">visibility</span>}
+                          {rec.prog_odometry && <span className="material-icons chip-detail-icon" title="Odometry">sensors</span>}
                         </div>
                       )}
                     </div>
@@ -229,15 +229,15 @@ export function TierListView({ records }: Props) {
       <div className="tier-legend">
         <h4>Scoring Legend</h4>
         <div className="legend-grid">
-          <span>🧗 Has Climb (+15)</span>
-          <span>👁 Vision (+8)</span>
-          <span>📡 Odometry (+7)</span>
-          <span>⚡ Autonomy (+5+)</span>
-          <span>🤝 Alliance Willing (+10)</span>
-          <span>🏆 5+ Years Exp (+10)</span>
-          <span>💡 Drive Coach (+5)</span>
-          <span>📋 Strategy (+5)</span>
-          <span>S ≥ 90 pts · A ≥ 70 · B ≥ 50 · C ≥ 30 · NO &lt; 30</span>
+          <span>Has Climb +15 pts</span>
+          <span>Vision +8 pts</span>
+          <span>Odometry +7 pts</span>
+          <span>Autonomy +5+ pts</span>
+          <span>Alliance Willing +10 pts</span>
+          <span>5+ Years Exp +10 pts</span>
+          <span>Drive Coach +5 pts</span>
+          <span>Strategy +5 pts</span>
+          <span>S ≥ 90 · A ≥ 70 · B ≥ 50 · C ≥ 30 · NO &lt; 30</span>
         </div>
       </div>
     </div>

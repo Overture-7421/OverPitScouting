@@ -90,7 +90,7 @@ export function TBAView() {
           <h2 className="view-title">The Blue Alliance</h2>
           <p className="view-subtitle">thebluealliance.com · {FRC_SEASON} · {FRC_EVENT_CODE}</p>
         </div>
-        <button className="btn btn-outline" onClick={load}>↻ Refresh</button>
+        <button className="btn btn-outline" onClick={load}><span className="material-icons" style={{ fontSize: 16 }}>refresh</span> Refresh</button>
       </div>
 
       {errors.length > 0 && (
@@ -100,15 +100,15 @@ export function TBAView() {
       )}
 
       <div className="stat-grid">
-        <StatCard label="Teams" value={teams.length || rankings.length} icon="🤖" color="#3b82f6" />
-        <StatCard label="Rankings" value={rankings.length} icon="🏆" color="#f59e0b" />
-        <StatCard label="Matches Played" value={played.length} icon="⚔️" color="#22c55e" />
-        <StatCard label="Scheduled (Qual)" value={qualMatches.length} icon="📋" color="#8b5cf6" />
-        <StatCard label="Avg Match Score" value={avgScore} icon="📊" color="#ec4899" />
+        <StatCard label="Teams" value={teams.length || rankings.length} icon="smart_toy" color="#3b82f6" />
+        <StatCard label="Rankings" value={rankings.length} icon="emoji_events" color="#f59e0b" />
+        <StatCard label="Matches Played" value={played.length} icon="sports" color="#22c55e" />
+        <StatCard label="Scheduled (Qual)" value={qualMatches.length} icon="assignment" color="#8b5cf6" />
+        <StatCard label="Avg Match Score" value={avgScore} icon="analytics" color="#ec4899" />
         <StatCard
           label="Top RP"
           value={topTeam?.sort_orders?.[0]?.toFixed(2) ?? '—'}
-          icon="⭐"
+          icon="grade"
           color="#f59e0b"
           sub={topTeam ? `Team ${tbaTeamNum(topTeam.team_key)}` : ''}
         />
@@ -181,7 +181,7 @@ export function TBAView() {
             style={{ marginLeft: 8 }}
             onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
           >
-            Sort {sortDir === 'asc' ? '↑' : '↓'}
+            Sort <span className="material-icons sort-icon">{sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}</span>
           </button>
         )}
         <input

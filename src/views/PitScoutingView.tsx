@@ -137,12 +137,12 @@ export function PitScoutingView({ records, onLoad }: Props) {
           onDrop={onDrop}
           onClick={() => fileRef.current?.click()}
         >
-          <div className="upload-icon">📂</div>
+          <span className="material-icons upload-icon">upload_file</span>
           <h2>Upload Pit Scouting CSV</h2>
           <p>Drag & drop your CSV here, or click to browse</p>
           <p className="upload-hint">Expects columns from configPitScoutingFTC.json</p>
           <button className="btn btn-primary" onClick={e => { e.stopPropagation(); fileRef.current?.click() }}>
-            Choose File
+            <span className="material-icons" style={{ fontSize: 16 }}>folder_open</span> Choose File
           </button>
           <input
             ref={fileRef}
@@ -162,7 +162,7 @@ export function PitScoutingView({ records, onLoad }: Props) {
       <div className="toolbar">
         <div className="toolbar-left">
           <button className="btn btn-primary" onClick={() => fileRef.current?.click()}>
-            📂 Upload CSV
+            <span className="material-icons" style={{ fontSize: 16 }}>upload_file</span> Upload CSV
           </button>
           <input
             ref={fileRef}
@@ -172,7 +172,8 @@ export function PitScoutingView({ records, onLoad }: Props) {
             onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])}
           />
           <button className="btn btn-outline" onClick={() => setShowFilters(f => !f)}>
-            {showFilters ? '⟵ Hide Filters' : '⟶ Show Filters'}
+            <span className="material-icons" style={{ fontSize: 16 }}>{showFilters ? 'chevron_left' : 'chevron_right'}</span>
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
           <input
             className="search-input"
@@ -262,12 +263,12 @@ export function PitScoutingView({ records, onLoad }: Props) {
         <div className="main-content">
           {/* Stat Cards */}
           <div className="stat-grid">
-            <StatCard label="Teams Scouted" value={filtered.length} icon="🤖" color="#8b5cf6" />
-            <StatCard label="Has Climb" value={`${boolPct(filtered, 'mech_has_climb')}%`} icon="🧗" color="#22c55e" />
-            <StatCard label="Has Vision" value={`${boolPct(filtered, 'prog_vision')}%`} icon="👁" color="#3b82f6" />
-            <StatCard label="Alliance Willing" value={`${boolPct(filtered, 'comp_alliance_willing')}%`} icon="🤝" color="#f59e0b" />
-            <StatCard label="Avg Auto Routines" value={avg(filtered, 'prog_auto_count')} icon="⚡" color="#ec4899" />
-            <StatCard label="Has Autonomous" value={`${boolPct(filtered, 'prog_has_auto')}%`} icon="🔄" color="#06b6d4" />
+            <StatCard label="Teams Scouted" value={filtered.length} icon="smart_toy" color="#8b5cf6" />
+            <StatCard label="Has Climb" value={`${boolPct(filtered, 'mech_has_climb')}%`} icon="fitness_center" color="#22c55e" />
+            <StatCard label="Has Vision" value={`${boolPct(filtered, 'prog_vision')}%`} icon="visibility" color="#3b82f6" />
+            <StatCard label="Alliance Willing" value={`${boolPct(filtered, 'comp_alliance_willing')}%`} icon="handshake" color="#f59e0b" />
+            <StatCard label="Avg Auto Routines" value={avg(filtered, 'prog_auto_count')} icon="bolt" color="#ec4899" />
+            <StatCard label="Has Autonomous" value={`${boolPct(filtered, 'prog_has_auto')}%`} icon="sync" color="#06b6d4" />
           </div>
 
           {/* Charts Row 1 */}
@@ -429,7 +430,7 @@ export function PitScoutingView({ records, onLoad }: Props) {
                       ] as [SortKey, string][]
                     ).map(([k, label]) => (
                       <th key={k} onClick={() => setSort(k)} className="sortable">
-                        {label} {sortKey === k ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+                        {label} {sortKey === k && <span className="material-icons sort-icon">{sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}</span>}
                       </th>
                     ))}
                   </tr>

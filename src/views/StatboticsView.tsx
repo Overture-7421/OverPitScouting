@@ -90,7 +90,7 @@ export function StatboticsView() {
           <h2 className="view-title">Statbotics</h2>
           <p className="view-subtitle">api.statbotics.io · EPA Analytics · {FRC_SEASON} · {FRC_EVENT_CODE}</p>
         </div>
-        <button className="btn btn-outline" onClick={load}>↻ Refresh</button>
+        <button className="btn btn-outline" onClick={load}><span className="material-icons" style={{ fontSize: 16 }}>refresh</span> Refresh</button>
       </div>
 
       {errors.length > 0 && (
@@ -100,18 +100,18 @@ export function StatboticsView() {
       )}
 
       <div className="stat-grid">
-        <StatCard label="Teams" value={teamEvents.length} icon="🤖" color="#22c55e" />
-        <StatCard label="Matches Played" value={played.length} icon="⚔️" color="#8b5cf6" />
-        <StatCard label="Avg EPA" value={avgEpa} icon="📊" color="#f59e0b" />
+        <StatCard label="Teams" value={teamEvents.length} icon="smart_toy" color="#22c55e" />
+        <StatCard label="Matches Played" value={played.length} icon="sports" color="#8b5cf6" />
+        <StatCard label="Avg EPA" value={avgEpa} icon="analytics" color="#f59e0b" />
         <StatCard
           label="Top EPA"
           value={ranked[0]?.epa?.total_points?.mean?.toFixed(1) ?? '—'}
-          icon="⭐"
+          icon="grade"
           color="#f59e0b"
           sub={ranked[0] ? `Team ${ranked[0].team}` : ''}
         />
-        <StatCard label="Avg Red Score" value={avgRedScore} icon="🔴" color="#ef4444" />
-        <StatCard label="Avg Blue Score" value={avgBlueScore} icon="🔵" color="#3b82f6" />
+        <StatCard label="Avg Red Score" value={avgRedScore} icon="circle" color="#ef4444" />
+        <StatCard label="Avg Blue Score" value={avgBlueScore} icon="circle" color="#3b82f6" />
       </div>
 
       {ranked.length > 0 && (

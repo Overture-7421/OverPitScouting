@@ -9,7 +9,7 @@ interface StatCardProps {
 export function StatCard({ label, value, sub, color = '#8b5cf6', icon }: StatCardProps) {
   return (
     <div className="stat-card" style={{ borderTopColor: color }}>
-      {icon && <span className="stat-icon">{icon}</span>}
+      {icon && <span className="material-icons stat-icon">{icon}</span>}
       <div className="stat-value" style={{ color }}>{value}</div>
       <div className="stat-label">{label}</div>
       {sub && <div className="stat-sub">{sub}</div>}

@@ -6,7 +6,7 @@ interface ErrorCardProps {
 export function ErrorCard({ message, onRetry }: ErrorCardProps) {
   return (
     <div className="error-card">
-      <span className="error-icon">⚠</span>
+      <span className="material-icons error-icon">warning</span>
       <p className="error-msg">{message}</p>
       {onRetry && (
         <button className="btn btn-outline" onClick={onRetry}>
