@@ -1,4 +1,4 @@
-import type { FTCTeam, FTCRanking, HybridMatch } from '../types'
+import type { FTCTeam, FTCRanking, HybridMatch, FTCMatchScore } from '../types'
 import { EVENT_CODE, SEASON } from '../constants'
 
 // ftc-api.firstinspires.org blocks browser CORS requests.
@@ -26,8 +26,8 @@ async function get<T>(path: string): Promise<T> {
 }
 
 export async function fetchFTCRankings(): Promise<FTCRanking[]> {
-  const data = await get<{ Rankings?: FTCRanking[] }>(`/v2.0/${SEASON}/rankings/${EVENT_CODE}`)
-  return data.Rankings ?? []
+  const data = await get<{ rankings?: FTCRanking[] }>(`/v2.0/${SEASON}/rankings/${EVENT_CODE}`)
+  return data.rankings ?? []
 }
 
 export async function fetchFTCTeams(): Promise<FTCTeam[]> {
@@ -38,10 +38,40 @@ export async function fetchFTCTeams(): Promise<FTCTeam[]> {
 }
 
 export async function fetchFTCSchedule(): Promise<HybridMatch[]> {
-  const data = await get<{ Schedule?: RawHybrid[] }>(
+  const data = await get<{ schedule?: RawHybrid[] }>(
     `/v2.0/${SEASON}/schedule/${EVENT_CODE}/qual/hybrid`,
   )
-  return (data.Schedule ?? []).map(mapHybrid)
+  return (data.schedule ?? []).map(mapHybrid)
+}
+
+interface RawAllianceScore {
+  alliance: string
+  autoPoints?: number
+  teleopPoints?: number
+}
+
+interface RawMatchScore {
+  matchNumber?: number
+  alliances?: RawAllianceScore[]
+}
+
+function mapScore(m: RawMatchScore): FTCMatchScore {
+  const red = m.alliances?.find(a => a.alliance === 'Red')
+  const blue = m.alliances?.find(a => a.alliance === 'Blue')
+  return {
+    matchNumber: m.matchNumber ?? 0,
+    redNP: (red?.autoPoints ?? 0) + (red?.teleopPoints ?? 0),
+    blueNP: (blue?.autoPoints ?? 0) + (blue?.teleopPoints ?? 0),
+    redAuto: red?.autoPoints ?? 0,
+    blueAuto: blue?.autoPoints ?? 0,
+  }
+}
+
+export async function fetchFTCScores(): Promise<FTCMatchScore[]> {
+  const data = await get<{ matchScores?: RawMatchScore[] }>(
+    `/v2.0/${SEASON}/scores/${EVENT_CODE}/qual`,
+  )
+  return (data.matchScores ?? []).map(mapScore)
 }
 
 interface RawHybrid {

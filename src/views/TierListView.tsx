@@ -227,9 +227,17 @@ export function TierListView({ records }: Props) {
 
       {/* Legend */}
       <div className="tier-legend">
-        <h4>Scoring Legend</h4>
+        <h4>Chip Icon Legend</h4>
+        <div className="legend-grid" style={{ marginBottom: 10 }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">fitness_center</span> Climb capable</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">visibility</span> Vision system</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">sensors</span> Odometry</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">bolt</span> Has autonomous (# = count)</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">handshake</span> Alliance willing</span>
+        </div>
+        <h4 style={{ marginTop: 8 }}>Scoring Weights</h4>
         <div className="legend-grid">
-          <span>Has Climb +15 pts</span>
+          <span>Climb +15 pts</span>
           <span>Vision +8 pts</span>
           <span>Odometry +7 pts</span>
           <span>Autonomy +5+ pts</span>

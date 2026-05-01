@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   PieChart, Pie, Cell, ScatterChart, Scatter, ZAxis,
@@ -12,7 +12,8 @@ import { EVENT_CODE, SEASON, CHART_COLORS } from '../constants'
 
 type SortDir = 'asc' | 'desc'
 type SortKey = keyof Pick<GQLTeamParticipation, 'teamNumber'> | 'rank' | 'rp' | 'wins' | 'losses' | 'ties' | 'opr'
-type ActiveTab = 'rankings' | 'matches' | 'teams'
+type ActiveTab = 'rankings' | 'matches' | 'teams' | 'compare'
+type CmpMetric = 'OPR' | 'OPR Auto' | 'OPR DC' | 'Avg Total' | 'Avg NP'
 
 export function GraphQLView() {
   const [data, setData] = useState<GQLEventData | null>(null)
@@ -22,6 +23,11 @@ export function GraphQLView() {
   const [sortKey, setSortKey] = useState<SortKey>('rank')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
   const [activeTab, setActiveTab] = useState<ActiveTab>('rankings')
+
+  const [cmpMetric, setCmpMetric] = useState<CmpMetric>('OPR')
+  const [cmpSearch, setCmpSearch] = useState('')
+  const [cmpTeams, setCmpTeams] = useState<Set<number>>(new Set())
+  const cmpInitRef = useRef(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -36,6 +42,31 @@ export function GraphQLView() {
   }, [])
 
   useEffect(() => { void load() }, [load])
+
+  const avgNpMap = useMemo(() => {
+    if (!data) return {} as Record<number, number>
+    const played = data.matches.filter(m => m.hasBeenPlayed && m.scores)
+    const sums: Record<number, number> = {}
+    const counts: Record<number, number> = {}
+    for (const m of played) {
+      const reds = m.teams.filter(t => t.alliance === 'Red').map(t => t.teamNumber)
+      const blues = m.teams.filter(t => t.alliance === 'Blue').map(t => t.teamNumber)
+      const rNP = m.scores?.red?.totalPointsNp ?? 0
+      const bNP = m.scores?.blue?.totalPointsNp ?? 0
+      for (const t of reds) { sums[t] = (sums[t] ?? 0) + rNP; counts[t] = (counts[t] ?? 0) + 1 }
+      for (const t of blues) { sums[t] = (sums[t] ?? 0) + bNP; counts[t] = (counts[t] ?? 0) + 1 }
+    }
+    return Object.fromEntries(Object.keys(sums).map(t => [Number(t), sums[Number(t)] / counts[Number(t)]]))
+  }, [data])
+
+  const allTeamNums = useMemo(() => data?.teams.map(t => t.teamNumber) ?? [], [data])
+
+  useEffect(() => {
+    if (!cmpInitRef.current && allTeamNums.length > 0) {
+      cmpInitRef.current = true
+      setCmpTeams(new Set(allTeamNums))
+    }
+  }, [allTeamNums])
 
   if (loading) return <Loading label="Querying FTCScout GraphQL…" />
   if (error) return (
@@ -130,6 +161,9 @@ export function GraphQLView() {
         <StatCard label="Avg Red Score" value={avgRed} icon="circle" color="#ef4444" />
         <StatCard label="Avg Blue Score" value={avgBlue} icon="circle" color="#3b82f6" />
         <StatCard label="Top OPR" value={topOPR.toFixed(1)} icon="grade" color="#f59e0b" />
+        {Object.keys(avgNpMap).length > 0 && (
+          <StatCard label="Avg NP (top)" value={Math.max(...Object.values(avgNpMap)).toFixed(1)} icon="bolt" color="#22c55e" />
+        )}
       </div>
 
       {top20RP.length > 0 && (
@@ -205,13 +239,15 @@ export function GraphQLView() {
 
       {/* Tabs */}
       <div className="tab-bar">
-        {(['rankings', 'matches', 'teams'] as const).map(t => (
+        {(['rankings', 'matches', 'teams', 'compare'] as const).map(t => (
           <button key={t} className={`tab-btn${activeTab === t ? ' active' : ''}`} onClick={() => setActiveTab(t)}>
-            {t.charAt(0).toUpperCase() + t.slice(1)}
+            {t === 'compare' ? 'Compare' : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
-        <input className="search-input" placeholder="Search team #…" value={search}
-          onChange={e => setSearch(e.target.value)} style={{ marginLeft: 'auto' }} />
+        {activeTab !== 'compare' && (
+          <input className="search-input" placeholder="Search team #…" value={search}
+            onChange={e => setSearch(e.target.value)} style={{ marginLeft: 'auto' }} />
+        )}
       </div>
 
       {activeTab === 'rankings' && (
@@ -229,7 +265,8 @@ export function GraphQLView() {
                   ))}
                   <th>Auto OPR</th>
                   <th>DC OPR</th>
-                  <th>Avg Score</th>
+                  <th>Avg Total</th>
+                  <th>Avg NP</th>
                   <th>Played</th>
                   <th>Name</th>
                 </tr>
@@ -247,12 +284,13 @@ export function GraphQLView() {
                     <td>{t.stats?.opr?.autoPoints?.toFixed(1) ?? '—'}</td>
                     <td>{t.stats?.opr?.dcPoints?.toFixed(1) ?? '—'}</td>
                     <td>{t.stats?.avg?.totalPoints?.toFixed(1) ?? '—'}</td>
+                    <td style={{ color: '#06b6d4' }}>{avgNpMap[t.teamNumber]?.toFixed(1) ?? '—'}</td>
                     <td>{t.stats?.qualMatchesPlayed ?? '—'}</td>
                     <td style={{ color: '#94a3b8', fontSize: 12 }}>{t.team?.name ?? '—'}</td>
                   </tr>
                 ))}
                 {filteredTeams.length === 0 && (
-                  <tr><td colSpan={12} style={{ textAlign: 'center', color: '#64748b', padding: 24 }}>No rankings data yet</td></tr>
+                  <tr><td colSpan={13} style={{ textAlign: 'center', color: '#64748b', padding: 24 }}>No rankings data yet</td></tr>
                 )}
               </tbody>
             </table>
@@ -345,6 +383,108 @@ export function GraphQLView() {
           </div>
         </div>
       )}
+
+      {activeTab === 'compare' && (() => {
+        function getCmpValue(teamNum: number): number {
+          const t = rankedTeams.find(x => x.teamNumber === teamNum)
+          switch (cmpMetric) {
+            case 'OPR':       return t?.stats?.opr?.totalPoints ?? 0
+            case 'OPR Auto':  return t?.stats?.opr?.autoPoints ?? 0
+            case 'OPR DC':    return t?.stats?.opr?.dcPoints ?? 0
+            case 'Avg Total': return t?.stats?.avg?.totalPoints ?? 0
+            case 'Avg NP':    return avgNpMap[teamNum] ?? 0
+            default:          return 0
+          }
+        }
+
+        const cmpDisplayTeams = allTeamNums.filter(t => !cmpSearch || String(t).includes(cmpSearch))
+        const cmpChartData = Array.from(cmpTeams)
+          .map(t => ({ name: String(t), value: Math.round(getCmpValue(t) * 10) / 10 }))
+          .filter(d => d.value > 0)
+          .sort((a, b) => b.value - a.value)
+
+        return (
+          <div>
+            <div className="tab-bar" style={{ marginBottom: 12 }}>
+              {(['OPR', 'OPR Auto', 'OPR DC', 'Avg Total', 'Avg NP'] as const).map(m => (
+                <button key={m} className={`tab-btn${cmpMetric === m ? ' active' : ''}`}
+                  onClick={() => setCmpMetric(m)}>{m}</button>
+              ))}
+              <span style={{ marginLeft: 'auto', color: '#64748b', fontSize: 13 }}>
+                {cmpTeams.size} / {allTeamNums.length} teams selected
+              </span>
+            </div>
+
+            <div className="chart-card" style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                <input className="search-input" placeholder="Filter by #…" value={cmpSearch}
+                  onChange={e => setCmpSearch(e.target.value)} style={{ width: 140 }} />
+                <button className="btn btn-outline" style={{ fontSize: 12, padding: '4px 10px' }}
+                  onClick={() => setCmpTeams(new Set(allTeamNums))}>All</button>
+                <button className="btn btn-outline" style={{ fontSize: 12, padding: '4px 10px' }}
+                  onClick={() => setCmpTeams(new Set())}>None</button>
+                <button className="btn btn-outline" style={{ fontSize: 12, padding: '4px 10px' }}
+                  onClick={() => {
+                    const top15 = [...allTeamNums]
+                      .sort((a, b) => getCmpValue(b) - getCmpValue(a))
+                      .slice(0, 15)
+                    setCmpTeams(new Set(top15))
+                  }}>Top 15</button>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, maxHeight: 110, overflowY: 'auto' }}>
+                {cmpDisplayTeams.map(t => {
+                  const on = cmpTeams.has(t)
+                  return (
+                    <button key={t}
+                      onClick={() => {
+                        const s = new Set(cmpTeams)
+                        on ? s.delete(t) : s.add(t)
+                        setCmpTeams(s)
+                      }}
+                      style={{
+                        padding: '2px 8px', borderRadius: 6, fontSize: 12, border: '1px solid',
+                        cursor: 'pointer',
+                        background: on ? 'rgba(139,92,246,0.3)' : 'transparent',
+                        borderColor: on ? '#8b5cf6' : '#374151',
+                        color: on ? '#a78bfa' : '#6b7280',
+                      }}>
+                      #{t}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {cmpChartData.length > 0 ? (
+              <div className="chart-card wide">
+                <h3>{cmpMetric} — {cmpChartData.length} teams (sorted)</h3>
+                <ResponsiveContainer width="100%" height={Math.max(260, cmpChartData.length * 26)}>
+                  <BarChart layout="vertical" data={cmpChartData} margin={{ left: 55, right: 50, top: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                    <XAxis type="number" stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+                    <YAxis type="category" dataKey="name" stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 11 }} width={52} />
+                    <Tooltip
+                      contentStyle={{ background: '#0d0d1f', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }}
+                      formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, cmpMetric]}
+                    />
+                    <Bar dataKey="value" fill="#8b5cf6" radius={[0, 4, 4, 0]} name={cmpMetric} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="empty-state">
+                <span className="material-icons empty-icon">bar_chart</span>
+                <h2>{cmpTeams.size === 0 ? 'No Teams Selected' : 'No Data Yet'}</h2>
+                <p style={{ color: '#94a3b8' }}>
+                  {cmpTeams.size === 0
+                    ? 'Use the team buttons above to select teams for comparison.'
+                    : 'Stats are available after matches have been played.'}
+                </p>
+              </div>
+            )}
+          </div>
+        )
+      })()}
 
       <div style={{ display: 'none' }}>{CHART_COLORS[0]}</div>
     </div>

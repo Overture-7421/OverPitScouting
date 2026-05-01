@@ -280,6 +280,14 @@ export interface StatboticsMatch {
   winner?: string
 }
 
+export interface FTCMatchScore {
+  matchNumber: number
+  redNP: number
+  blueNP: number
+  redAuto: number
+  blueAuto: number
+}
+
 export type TierLevel = 'S' | 'A' | 'B' | 'C' | 'NO'
 
 export interface TierState {

@@ -211,7 +211,21 @@ export function FRCTierListView({ records }: Props) {
       </div>
 
       <div className="tier-legend">
-        <h4>FRC Scoring Legend (max ~128 pts)</h4>
+        <h4>Chip Icon Legend</h4>
+        <div className="legend-grid" style={{ marginBottom: 10 }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">360</span> Swerve drive</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">settings</span> Mecanum drive</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">directions_car</span> Tank drive</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">place</span> Path Planner</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">bolt</span> CANivore bus</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">battery_full</span> Battery peak tested</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">sports_soccer</span> Spec: Score</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">back_hand</span> Spec: Feed</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">sports_kabaddi</span> Spec: Steal</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">shield</span> Spec: Defend</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-icons chip-detail-icon">grade</span> Spec: Overall</span>
+        </div>
+        <h4 style={{ marginTop: 8 }}>Scoring Weights (max ~128 pts)</h4>
         <div className="legend-grid">
           <span>Swerve +15 · Mecanum +8 · Tank +5</span>
           <span>Path Planner +10</span>
