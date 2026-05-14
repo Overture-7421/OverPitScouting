@@ -1,0 +1,370 @@
+================================================================================
+  OVERTURE PIT SCOUTING ANALYZER — FTC COMPLETE REFERENCE
+================================================================================
+  App: FTC Pit Scouting Analyzer
+  Team: OVERTURE
+  Mode covered in this document: FTC (FIRST Tech Challenge)
+================================================================================
+
+
+--------------------------------------------------------------------------------
+  WHAT IS THIS APP?
+--------------------------------------------------------------------------------
+
+The OVERTURE Pit Scouting Analyzer is a client-side React web dashboard built
+to help FTC teams make alliance selection and strategy decisions during
+competitions. It has two major pillars:
+
+  1. Pit Scouting CSV Analysis
+     Upload the data your scouts collected in the pits (via a Google Form or
+     similar tool), and the app instantly turns rows of answers into charts,
+     statistics, filters, and a ranked Tier List.
+
+  2. Live Competition Data (2 sources)
+     Pull real-time rankings, match scores, OPR, and team rosters directly from
+     official FTC APIs without leaving the dashboard.
+
+Everything runs in the browser. There is no backend server; the only
+server-side component is a lightweight Cloudflare Worker that proxies FTC Events
+API calls (which block CORS from the browser).
+
+
+--------------------------------------------------------------------------------
+  FTC VIEWS / TABS (4 total)
+--------------------------------------------------------------------------------
+
+1. PIT SCOUTING
+   What it does:
+   - Accepts a CSV file (drag-and-drop or browse) produced by your pit scouting
+     Google Form (configured via configPitScoutingFTC.json v1.1.0).
+   - Parses every row client-side with a quote-aware CSV parser that handles
+     commas inside fields, varied line endings, and flexible header naming
+     (e.g., "team_number" or "Team Number" both work).
+   - Displays a filterable, sortable team table with every scouted field.
+   - Shows summary statistics: % of teams with each boolean feature (climb,
+     vision, odometry, autonomous, alliance-willing, etc.) and group-by charts
+     (bar + pie) for categorical fields such as programming language, controller
+     type, shooter type, and experience level.
+   - Lets you search by team number or examiner name and filter by any major
+     category (e.g., "show only teams with climb" or "show only Java teams").
+
+   What it is good for:
+   - Quickly spotting which robots in your event have the capabilities you need.
+   - Surfacing at a glance what % of the field has autonomous, vision, or climb.
+   - Handing your strategy lead a clean, filtered view instead of a spreadsheet.
+
+
+2. GRAPHQL (via api.ftcscout.org)
+   What it does:
+   - Queries the FTCScout GraphQL API for a specific event (season + event code).
+   - Fetches in a single request: event metadata, team list, full standings
+     including OPR breakdown (auto OPR, DC OPR), and every qualification match
+     with per-alliance point breakdowns.
+   - Displays five sub-tabs:
+       Rankings  — Rank, Team #, RP, OPR, W/L/T, Auto OPR, DC OPR, Avg Total,
+                   Avg NP, matches played, team name. Sortable + searchable.
+       Matches   — Q#, level, Red/Blue team numbers, Red/Blue scores, auto
+                   points per alliance, match winner.
+       Teams     — Team #, name, school, city, state, country, rookie year.
+       Compare   — Multi-select teams, compare OPR metrics side-by-side.
+                   Quick-pick buttons for Top 15 teams by rank.
+       Charts    — Top-20 RP vs OPR grouped bar chart; W/L/T pie chart;
+                   Auto OPR vs DC OPR scatter (bubble size = RP);
+                   Last-20 match scores Red vs Blue line chart.
+   - OPR values come pre-computed from FTCScout (they maintain it).
+
+   What it is good for:
+   - Evaluating scoring capability per robot using OPR split into auto and DC.
+   - Comparing two or three alliance candidates head-to-head on a single screen.
+   - Monitoring live rankings as qualifications progress.
+
+
+3. REST API (via ftc-api.firstinspires.org through Cloudflare Worker proxy)
+   What it does:
+   - Calls the official FIRST FTC Events API (requires a proxy because
+     ftc-api.firstinspires.org blocks browser CORS requests).
+   - Fetches: rankings (rank, RP, TB, W/L/T, qual average), team roster
+     (number, name, city, state, country, rookie year), hybrid match schedule
+     (match #, teams by station, Red/Blue final scores), and detailed match
+     scores (auto + teleop breakdown).
+   - Computes OPR locally using a Gauss-Seidel iterative solver (80 iterations,
+     converges in 30–50) that decomposes each alliance score into individual
+     team contributions.
+   - Shows four sub-tabs mirroring the GraphQL view: Rankings, Teams,
+     Matches, Charts.
+
+   What it is good for:
+   - Official data straight from FIRST, useful as a cross-check against FTCScout.
+   - Events or seasons where FTCScout data may be delayed or incomplete.
+   - Independently verifying OPR with a local calculation.
+
+
+4. TIER LIST
+   What it does:
+   - Automatically scores every team from your uploaded pit scouting CSV using
+     a weighted rubric (see scoring section below) and assigns each an initial
+     tier: S / A / B / C / NO.
+   - Displays teams as draggable cards inside their tier rows. You can:
+       - Drag a card to a different tier to override the auto-assignment.
+       - Add a free-text note to any team card.
+       - Add teams manually (by number) if they were not scouted.
+   - A "Reset" button restores all teams to their auto-scored tiers.
+   - An "Export CSV" button downloads the current tier list (team number, auto
+     tier, manual tier, score, notes) for sharing with your alliance selection
+     team.
+   - Team cards display key capability icons for fast visual scanning
+     (climb, vision, auto, etc.).
+
+   What it is good for:
+   - Alliance selection preparation: walk into the selection meeting with a
+     ranked list that reflects both objective data and your team's judgment.
+   - Strategy discussions: the drag interface lets your team argue about and
+     settle on placements together in real time.
+   - Exporting a clean record of your selection rationale.
+
+
+--------------------------------------------------------------------------------
+  PIT SCOUTING DATA — FIELDS COLLECTED (FTC)
+--------------------------------------------------------------------------------
+
+The pit scouting form tracks 32 fields per team grouped in four categories:
+
+  META
+    team_number        — Team's FTC number
+    timestamp          — When the form was submitted
+    examiner_name      — Scout who collected the data
+    examiner_feeling   — Scout's subjective confidence rating
+
+  MECHANICAL (9 fields)
+    mech_drive_motors  — Number of drive motors
+    mech_shooter_type  — Turret / Fixed / Multiple / None
+    mech_indexer       — Has ball indexer (bool)
+    mech_has_climb     — Has climbing mechanism (bool)
+    mech_climb_time    — Climb time bracket: <5s / 5-10s / 10-20s / >20s / none
+    mech_checklist     — Uses pre-match checklist (bool)
+    mech_spare_parts   — Has spare parts at event (bool)
+    mech_self_repair   — Can self-repair in the pits (bool)
+    mech_drive_team_fix — Drive team can fix on field (bool)
+
+  PROGRAMMING (9 fields)
+    prog_language      — Java / OnBot Java / Blocks / Other
+    prog_path_lib_used — Uses a path-planning library (bool)
+    prog_path_lib      — None / Road Runner / Pedro Pathing / FTCLib / Custom / Other
+    prog_has_auto      — Has autonomous routine (bool)
+    prog_auto_count    — Number of distinct auto routines
+    prog_vision        — Has vision processing (bool)
+    prog_vision_lib    — None / TFOD / AprilTags / EasyOpenCV / Custom / Other
+    prog_odometry      — Uses odometry (bool)
+    prog_processor     — Has dedicated coprocessor (bool)
+
+  ELECTRICAL (10 fields)
+    elec_controller    — REV Control Hub / Android Phone / Hybrid / Other
+    elec_motor_count   — Total motor count
+    elec_servo_count   — Total servo count
+    elec_extra_motors  — Has backup/extra motors (bool)
+    elec_extra_cables  — Has backup/extra cables (bool)
+    elec_cable_mgmt    — Organized cable management (bool)
+    elec_cable_protection — Cables physically protected (bool)
+    elec_connections   — Soldered / XT30 / JST / Mixed / Other
+    elec_monitoring    — Has battery/power monitoring (bool)
+    elec_power_dist    — Has power distribution board (bool)
+
+  COMPETENCES (10 fields)
+    comp_batteries     — Number of batteries: 1 / 2 / 3-5 / 6+
+    comp_first_inspection — Pre-inspected before event (bool)
+    comp_experience    — Rookie / 1-2 yrs / 3-5 yrs / 5+ yrs
+    comp_drive_coach   — Has experienced drive coach (bool)
+    comp_student_drive — Students drive the robot (bool)
+    comp_human_player  — Has trained human player (bool)
+    comp_practice_freq — Daily / 2-3x week / Weekly / Rarely
+    comp_has_strategy  — Has documented game strategy (bool)
+    comp_alliance_willing — Willing to adapt for alliance partner (bool)
+    comp_commitment    — Low / Moderate / Good / High / Excellent / More than us
+
+
+--------------------------------------------------------------------------------
+  TIER LIST SCORING RUBRIC (FTC)
+--------------------------------------------------------------------------------
+
+Each team receives a score out of approximately 147 points. Higher scores
+reflect more capable, reliable, and alliance-friendly robots.
+
+  MECHANICAL CATEGORY (max 35 pts)
+    Has climb                           +15
+    Climb time (<5s)                    +12
+    Climb time (5-10s)                  +8
+    Climb time (10-20s)                 +4
+    Has indexer                         +4
+    Has spare parts                     +3
+    Can self-repair                     +4
+    Uses pre-match checklist            +2
+    4 or more drive motors              +3
+
+  PROGRAMMING CATEGORY (max 40 pts)
+    Has vision                          +8
+    Has odometry                        +7
+    Has autonomous routine              +5
+    Auto routine count: 1               +3
+    Auto routine count: 2               +6
+    Auto routine count: 3               +9
+    Uses path library                   +5
+    Language: Java                      +4
+    Language: OnBot Java                +2
+    Has coprocessor                     +3
+
+  ELECTRICAL CATEGORY (max 12 pts)
+    Cable management                    +3
+    Cable protection                    +3
+    Power monitoring                    +2
+    Extra motors available              +2
+    Extra cables available              +2
+    Power distribution board            +2
+
+  COMPETENCES CATEGORY (max 60 pts)
+    Experience: Rookie                  +1
+    Experience: 1-2 years               +4
+    Experience: 3-5 years               +7
+    Experience: 5+ years                +10
+    Practice: Daily                     +5
+    Practice: 2-3x/week                 +3
+    Practice: Weekly                    +1
+    Practice: Rarely                    +0
+    Commitment: Low                     +0
+    Commitment: Moderate                +3
+    Commitment: Good                    +7
+    Commitment: High                    +10
+    Commitment: Excellent               +13
+    Commitment: More than us            +15
+    Has drive coach                     +5
+    Has strategy                        +5
+    Alliance willing                    +10  ← highest single signal
+    Pre-inspected before event          +3
+    Has trained human player            +3
+
+  TIER THRESHOLDS
+    S  —  Score >= 90   (elite alliance picks)
+    A  —  Score >= 70   (strong picks)
+    B  —  Score >= 50   (solid, consider)
+    C  —  Score >= 30   (limited capability)
+    NO —  Score <  30   (not recommended)
+
+
+--------------------------------------------------------------------------------
+  WHAT THE APP IS GOOD FOR (FTC USE CASES)
+--------------------------------------------------------------------------------
+
+BEFORE QUALIFICATIONS START
+  - Import overnight pit scouting data and instantly see which teams have climb,
+    vision, and autonomous — capabilities that win FTC matches.
+  - Identify teams with high commitment and alliance-willingness: these make
+    great partners regardless of raw robot capability.
+  - Flag teams that have NO auto or NO climb before strategy discussions so your
+    alliance picks reflect actual field capability, not assumptions.
+
+DURING QUALIFICATIONS
+  - Use the GraphQL or REST API tabs to track live rankings. Watch which teams
+    are climbing the standings and which are stagnating.
+  - The OPR scatter (Auto OPR vs DC OPR) instantly shows you which teams score
+    in auto vs. which score in driver control — critical for alliance composition.
+  - Cross-reference live match scores with pit scouting data to validate or
+    update your assessment of individual teams.
+
+ALLIANCE SELECTION
+  - Open the Tier List with the S and A teams at a glance.
+  - Drag teams up or down based on what you observed during qualifications.
+  - Add notes per team ("climbs reliably", "auto often fails", "great drive
+    coach") to capture scouting observations that numbers don't show.
+  - Export the final tier list CSV to share with your alliance selection team
+    or keep as a record.
+
+STRATEGY MEETINGS
+  - The Compare tab lets you pit 2–3 specific teams side-by-side on OPR
+    metrics, useful when debating between two A-tier picks.
+  - Filter the Pit Scouting table to "teams with climb + vision + Java" to
+    quickly find the most complete robots on the field.
+  - Charts give leadership a fast summary without needing to dig through data.
+
+
+--------------------------------------------------------------------------------
+  API DETAILS (FTC)
+--------------------------------------------------------------------------------
+
+  FTCScout GraphQL API
+    Endpoint : https://api.ftcscout.org/graphql
+    Auth     : None required
+    CORS     : Allowed (direct browser calls)
+    Data     : Rankings, OPR, match scores, team roster for any event/season
+    Config   : Set EVENT_CODE and SEASON in src/constants.ts before build
+
+  FTC Events REST API (FIRST official)
+    Endpoint : https://ftc-api.firstinspires.org/v2.0/...
+    Auth     : Basic Auth (username + token from FIRST)
+    CORS     : BLOCKED — requires proxy
+    Proxy    : Cloudflare Worker (deployed separately, URL in constants.ts)
+    Data     : Rankings, teams, hybrid schedule, match scores (same event)
+
+  Cloudflare Worker
+    Purpose  : Adds CORS headers and forwards requests to FTC Events API with
+               embedded credentials, so the browser can call it freely.
+    Deploy   : Separate Cloudflare project (wrangler.toml not in this repo)
+
+
+--------------------------------------------------------------------------------
+  TECH STACK (FTC-RELEVANT)
+--------------------------------------------------------------------------------
+
+  React 19.2 + TypeScript 6.0   — Component UI and full type safety
+  Vite 8.0                       — Build tool and local dev server
+  Recharts 3.8                   — All charts (bar, pie, scatter, responsive)
+  GitHub Pages (docs/ folder)    — Static hosting, no backend
+  Cloudflare Worker              — FTC Events API CORS proxy
+  Google Material Icons          — UI icons in team cards and nav
+
+
+--------------------------------------------------------------------------------
+  CONFIGURATION FILES (FTC)
+--------------------------------------------------------------------------------
+
+  public/configJSONs/FTC/configPitScoutingFTC.json (v1.1.0)
+    Defines the Google Form structure used to generate the CSV.
+    Keeps form field names in sync with the parser expected headers.
+
+  src/constants.ts
+    EVENT_CODE   — FTC event code (e.g., "FTCCMP1GOOD")
+    SEASON       — FTC season year (e.g., 2025)
+    CHART_COLORS — Color palette for Recharts
+    TIER_META    — Tier label + color mapping (S/A/B/C/NO)
+
+  src/utils/score.ts
+    Full FTC scoring rubric implementation.
+    scoreFTCTeam(row) → { score: number, tier: "S"|"A"|"B"|"C"|"NO" }
+
+  src/utils/csv.ts
+    FTC CSV parsing logic. Exports: parseCSV, groupBy, boolPct, avg.
+
+  src/utils/graphql.ts
+    FTCScout GraphQL query builder and fetch wrapper.
+
+  src/utils/ftcApi.ts
+    FTC Events API functions: fetchRankings, fetchTeams, fetchSchedule,
+    fetchMatchScores. All route through the Cloudflare Worker URL.
+
+  src/utils/opr.ts
+    Gauss-Seidel OPR solver used by the REST API view for local OPR
+    calculation independent of FTCScout.
+
+
+--------------------------------------------------------------------------------
+  SAMPLE DATA
+--------------------------------------------------------------------------------
+
+  public/CSVs/
+    Contains sample pit scouting CSVs for development and demo purposes.
+    Use these to test the Pit Scouting and Tier List views without real event
+    data.
+
+
+================================================================================
+  END OF FTC REFERENCE DOCUMENT
+  Generated: 2026-05-13 | OVERTURE Pit Scouting Analyzer
+================================================================================

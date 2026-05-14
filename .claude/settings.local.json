@@ -8,7 +8,9 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(f['\\\\''name'\\\\''],'-',f['\\\\''type'\\\\'']['\\\\''name'\\\\''] or f['\\\\''type'\\\\'']['\\\\''ofType'\\\\'']['\\\\''name'\\\\''] if f['\\\\''type'\\\\''].get\\('\\\\''ofType'\\\\''\\) else f['\\\\''type'\\\\'']['\\\\''name'\\\\'']\\) for f in d['\\\\''data'\\\\'']['\\\\''MS2025'\\\\'']['\\\\''fields'\\\\'']]\")",
       "Bash(npx vite *)",
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(list\\(d.keys\\(\\)\\)[:5]\\)\")",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(Get-ChildItem -Path \"D:\\\\1.SQM\\\\2.OVERTURE\\\\FTCPitScoutingAnalyzer\" -Recurse)",
+      "Bash(Select-Object FullName)"
     ]
   }
 }

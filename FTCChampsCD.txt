@@ -1,0 +1,37 @@
+**SCOUTING**
+
+This Championship marked the most structured and data-driven scouting effort Overture has ever done at any point in FTC during
+this season, however, due to logistical issues we had a lot fewer people than what we would like, thus, only Pit-Scouting was done.
+Going into Houston, we knew that alliance selection at this scale is a completely different to our regional events you're not
+just picking the best robot in your region, you're navigating a field of over 100 teams where every top alliance
+pick matters enormously.
+
+**Pit Scouting**
+During the pit scouting, our scouts fanned out across the Goodall Division pits with a structured in-house purpose built scouting 
+application covering 32 data points per team, from mechanical capabilities like climbing time and shooter type, to programming 
+depth like path libraries, odometry, and vision, all the way to competences like drive team experience, commitment level, 
+and alliance willingness. Every response fed directly into our Overture Pit Scouting Analyzer, a custom React dashboard we also 
+built which parsed the CSV and instantly surfaced charts, statistics, and a ranked Tier List of every scouted team.
+
+**Live Data During Qualifications**
+While qualifications ran, we kept the dashboard open on the GraphQL and REST API tabs, pulling live rankings, OPR breakdowns, 
+and match scores directly from FTCScout and the official FIRST FTC Events API. The OPR scatter (Auto OPR vs. Driver Control OPR) 
+was particularly useful for identifying which robots were genuinely contributing in autonomous versus which were purely 
+driver-control scorers, a critical distinction when thinking about alliance composition.
+
+**Tier List and Alliance Preparation**
+By the end of qualifications, the Tier List had auto-scored every scouted team using our weighted rubric — rewarding vision, 
+odometry, climb capability, autonomous routines, and alliance willingness and assigned each team a tier from S down. 
+Our strategy team then dragged cards between tiers based on what we'd actually observed on the field, added notes like 
+"climbs consistently" or "auto often fails," and walked into alliance selection with a clean, ranked picture rather than gut 
+instinct.
+
+**What We Learned**
+- Having a custom tool that combines pit data with live API data in one dashboard is a massive advantage and something we want 
+    to keep refining.
+- Scouts need clearer guidance on what to prioritize when time in the pit is short at Worlds, teams are busy and windows are 
+    narrow.
+- The Tier List drag interface was genuinely useful for real-time team debates; it should remain a core part of our selection 
+    process.
+- OPR alone is not enough, cross-referencing it with pit scouting notes catches things numbers miss, like unreliable autonomous 
+    routines or a really strong drive coach.
